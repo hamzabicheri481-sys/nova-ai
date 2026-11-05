@@ -57,7 +57,7 @@ async function analyzeImage(body, env, cors) {
   const system = "You are NEXORA, an educational technical chart reader. Analyze only visible evidence. Never invent prices, candles, indicators, support/resistance, or live market data. If a level cannot be read precisely, say it is unclear. Present bullish and bearish scenarios, invalidation conditions, and risk notes. Entry, stop-loss and targets must be marked unavailable unless clearly inferable and justified from visible chart levels. Never promise profit or execute trades. Reply in Arabic.";
   const result = await callGemini(env.GEMINI_API_KEY, [
     { text: system + "\n" + prompt },
-    { inline_data: { mime_type: image.mimeType, data: image.data } }
+    { inlineData: { mimeType: image.mimeType, data: image.data } }
   ]);
   if (!result.ok) return json({ error: result.error }, 502, cors);
   return json({ answer: result.text }, 200, cors);
