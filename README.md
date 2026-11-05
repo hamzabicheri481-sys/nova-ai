@@ -15,3 +15,15 @@ A mobile-friendly starter website for a multilingual AI workspace.
 
 ## Before monetization
 A secure server-side backend is required for AI provider keys, authentication, usage limits, credit balances and payment webhooks. Never put secret API keys in browser JavaScript. Add privacy, terms, refund and contact information before accepting customers.
+
+
+## NOVA Trading Analyst backend setup
+
+The chart-analysis interface calls a separate Cloudflare Worker so the Gemini API key is never exposed in the public GitHub Pages site.
+
+1. Create a Cloudflare Worker and paste the contents of `worker.js` into its editor, then deploy it.
+2. In the Worker settings, add a secret named `GEMINI_API_KEY` containing your key from Google AI Studio. Never put this key in `index.html`, GitHub files, or public messages.
+3. Copy the deployed Worker URL.
+4. In `index.html`, set `NOVA_TRADING_API` to that Worker URL, commit the change, and wait for GitHub Pages to redeploy.
+
+Until these steps are complete, the Trading Analyst UI is present but live AI analysis is not active. Gemini can accept image input through its generateContent API. Chart analysis is educational only and must not be treated as a guaranteed trading signal.
