@@ -76,7 +76,8 @@
 <div><label class="field-label" for="timeframe">الإطار الزمني</label><select class="field wide" id="timeframe"><option>15 دقيقة</option><option>1 ساعة</option><option>4 ساعات</option><option>يومي</option><option>أسبوعي</option></select></div>
 <div><label class="field-label" for="chartNotes">وصف الشارت والمعطيات (السعر، الاتجاه، الدعوم، المقاومات، المؤشرات...)</label><textarea class="textarea" id="chartNotes" placeholder="مثال: الذهب على إطار الساعة، السعر الحالي حسب منصتي هو ...، السعر قريب من مقاومة ...، RSI عند ... . حلل لي السيناريوهات المحتملة."></textarea></div>
 <button class="btn primary wide" id="analyzeBtn">حلّل المعطيات ✦</button>
-<div class="hint">ما تكتبش معلومات الدخول للحساب أو مفاتيح API. مازال رفع صور الشارت غير متاح في هذه النسخة.</div>
+<div><label class="field-label" for="chartImage">أو رفع صورة الشارت (PNG / JPG / WEBP)</label><input class="field wide" id="chartImage" type="file" accept="image/png,image/jpeg,image/webp"><p class="hint">صورة واضحة بلا بيانات حسابك أو معلومات شخصية. الحد الأقصى 4MB.</p></div>
+<div class="hint">المحلل يقرأ الصورة والمعطيات المتاحة فقط؛ إذا كانت الأسعار أو المحاور غير واضحة سيطلب معلومات إضافية.</div>
 <div class="result" id="analysisResult" aria-live="polite"></div>
 </div>
 </div>
@@ -142,11 +143,20 @@ analyzeBtn.addEventListener('click',async()=>{
  const asset=document.getElementById('asset').value;
  const timeframe=document.getElementById('timeframe').value;
  const notes=document.getElementById('chartNotes').value.trim();
- if(!notes){resultBox.style.display='block';resultBox.textContent='كتب معطيات الشارت أو وصفه قبل التحليل.';return;}
- analyzeBtn.disabled=true;analyzeBtn.textContent='جاري التحليل...';resultBox.style.display='block';resultBox.textContent='كنحلل المعطيات اللي دخلتي...';
- const prompt='أنت مساعد تعليمي متخصص في شرح التحليل الفني وإدارة المخاطر باللغة العربية. حلل فقط المعلومات التي يقدمها المستخدم. لا تدّع أنك ترى بيانات مباشرة أو شارتاً لم يتم إرساله. لا تخترع السعر الحالي أو الأخبار أو مستويات الدعم والمقاومة. إذا كانت البيانات غير كافية، اذكر ما ينقص بوضوح. لا تصدر أمراً مباشراً بالشراء أو البيع ولا تضمن الأرباح. قدم: 1) ملخص المعطيات 2) الاتجاه المحتمل مع درجة ثقة وصفية لا رقمية إذا لا توجد بيانات كافية 3) سيناريو صاعد وسيناريو هابط 4) مستويات الدعم والمقاومة المذكورة من المستخدم فقط 5) المخاطر وما الذي يبطل كل سيناريو 6) أسئلة أو بيانات إضافية لازمة. السوق: '+asset+'. الإطار الزمني: '+timeframe+'. معطيات المستخدم: '+notes;
+ const imageFile=document.getElementById('chartImage').files[0];
+ if(!notes&&!imageFile){resultBox.style.display='block';resultBox.textContent='كتب معطيات الشارت أو ارفع صورة واضحة قبل التحليل.';return;}
+ if(imageFile && !['image/png','image/jpeg','image/webp'].includes(imageFile.type)){resultBox.style.display='block';resultBox.textContent='نوع الصورة غير مدعوم. استعمل PNG أو JPG أو WEBP.';return;}
+ if(imageFile && imageFile.size>4*1024*1024){resultBox.style.display='block';resultBox.textContent='الصورة كبيرة بزاف. الحد الأقصى هو 4MB.';return;}
+ analyzeBtn.disabled=true;analyzeBtn.textContent='جاري قراءة الشارت...';resultBox.style.display='block';resultBox.textContent='كنقرا الصورة والمعطيات...';
+ const prompt='أنت محلل فني تعليمي باللغة العربية. اقرأ صورة الشارت المرفقة إن وجدت، واستعمل فقط ما يمكن رؤيته بوضوح. لا تدّع الوصول إلى أسعار مباشرة أو بيانات غير ظاهرة، ولا تخترع الأرقام أو مستويات الدخول. استخرج السوق والإطار الزمني إن كانا ظاهرين، وحدد الاتجاه والبنية (قمم/قيعان)، والدعم والمقاومة فقط إذا أمكن تحديدهما من الصورة بوضوح. اعرض سيناريو صاعداً وآخر هابطاً، وما الذي يبطل كل سيناريو. إذا كانت الصورة غير واضحة أو لا تكفي لتحديد سعر دقيق، قل ذلك واطلب لقطة أوضح. يمكن ذكر منطقة دخول محتملة ووقف خسارة وأهداف فقط إذا كانت مستوياتها قابلة للقراءة والتبرير من الشارت، وإلا اكتب "غير محدد". لا تقدم ضمان ربح ولا تنفذ صفقات. السوق المختار: '+asset+'. الإطار الزمني المختار: '+timeframe+'. ملاحظات المستخدم: '+(notes||'لا توجد ملاحظات إضافية');
  try{
-  const response=await fetch(API_BASE.replace(/\/$/,'')+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'NEXORA Technical Education',prompt})});
+  let payload={mode:'NEXORA Chart Image Analysis',prompt};
+  if(imageFile){
+   const imageData=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]||'');reader.onerror=()=>reject(new Error('تعذر قراءة الصورة.'));reader.readAsDataURL(imageFile);});
+   payload.image={mimeType:imageFile.type,data:imageData};
+  }
+  const endpoint=imageFile?'/analyze-image':'/chat';
+  const response=await fetch(API_BASE.replace(/\/$/,'')+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   const data=await response.json();
   if(!response.ok)throw new Error(data.error||'تعذر إكمال التحليل');
   resultBox.textContent=data.answer||'ما توصلناش بجواب. حاول مرة أخرى.';
