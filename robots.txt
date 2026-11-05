@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hamzabicheri481-sys.github.io/nova-ai/sitemap.xml
