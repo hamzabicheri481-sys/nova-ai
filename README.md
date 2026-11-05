@@ -20,12 +20,13 @@ Current Pages URL: https://hamzabicheri481-sys.github.io/nova-ai/
 
 The backend code is in `worker.js`. It exposes:
 - `POST /chat` for text-based AI responses.
+- `POST /analyze-image` for chart screenshot reading (PNG, JPEG, WEBP; max 4 MB).
 
 Setup:
 1. Open Cloudflare **Workers & Pages**.
-2. Deploy the complete contents of `worker.js` to the Worker.
+2. Deploy `worker.js` as the Worker named `nova-ai`. You can deploy manually from Cloudflare, or configure the optional GitHub Actions deployment below.
 3. Add a Worker secret named `GEMINI_API_KEY` using a key created in Google AI Studio. Never put this secret in the repository, website HTML, or a public message.
-4. The website currently calls the existing Worker URL configured in `index.html`.
+4. The website currently calls `https://nova-ai.hamzabicheri481.workers.dev`, configured in `index.html`.
 
 The browser sends requests only to the Worker. The Gemini key remains server-side.
 
@@ -70,3 +71,14 @@ The current agreed commercial target is:
 - Account registration and login method: **not implemented**.
 
 Until these decisions and implementation tests are complete, do not show an active checkout or claim that subscriptions are available.
+
+
+### Optional automated Worker deployment
+
+The repository includes `.github/workflows/deploy-worker.yml` and `wrangler.toml`. To enable manual deployment from GitHub Actions, add these two repository Actions secrets (never commit them):
+- `CLOUDFLARE_API_TOKEN`: a Cloudflare API token with permission to edit/deploy Workers for this account.
+- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID.
+
+Then open **GitHub → Actions → Deploy Cloudflare Worker → Run workflow**. The workflow is manual-only so it will not fail before the secrets are configured. The Gemini key remains a separate Cloudflare Worker secret named `GEMINI_API_KEY`.
+
+The GitHub Pages workflow deploys the website only; it does not deploy the Worker. A successful Pages deployment does not prove the AI backend is deployed.
