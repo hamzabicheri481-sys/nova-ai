@@ -73,7 +73,7 @@ document.getElementById('go').addEventListener('click',async()=>{
   heading.textContent='جواب NOVA AI';
   output.style.display='block';
   try{
-   const response=await fetch(NOVA_API_BASE.replace(/\\/$/, '')+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode,prompt:p})});
+   const response=await fetch(NOVA_API_BASE.replace(/\/$/, '')+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode,prompt:p})});
    const data=await response.json();
    if(!response.ok)throw new Error(data.error||'تعذر الحصول على الجواب');
    built.textContent=data.answer||'ما توصلناش بجواب.';
@@ -81,7 +81,7 @@ document.getElementById('go').addEventListener('click',async()=>{
   finally{btn.disabled=false;btn.textContent='Generate ✨';}
  }else{
   const instructions={'AI Assistant':'Act as a helpful, accurate AI assistant. Understand the request, ask only essential clarifying questions, and give a clear step-by-step answer.','Writing':'Act as a professional writing assistant. Improve clarity, structure and tone while preserving the intended meaning. Provide a polished final draft.','Ideas':'Act as a creative strategist. Generate original, practical ideas, explain why each could work, and suggest the best first step.','Image prompts':'Act as an expert visual prompt writer. Create a detailed image-generation prompt covering subject, composition, lighting, style, colors and aspect ratio.','Code help':'Act as a patient senior developer. Explain the solution simply, provide complete working code when appropriate, and point out how to test it.','Trading analysis':'Act as a cautious technical-analysis tutor. Never invent market data or promise profit. Explain trend, structure, key levels, invalidation and risk. If evidence is unclear, say WAIT / NO TRADE.'};
-  const result=(instructions[mode]||instructions['AI Assistant'])+'\\n\\nUser request:\\n'+p+'\\n\\nImportant: Reply in the same language as the user. Be specific, honest about uncertainty, and format the answer clearly.';
+  const result=(instructions[mode]||instructions['AI Assistant'])+'\n\nUser request:\n'+p+'\n\nImportant: Reply in the same language as the user. Be specific, honest about uncertainty, and format the answer clearly.';
   heading.textContent='Prompt جاهز للاستعمال (وضع تجريبي)';
   built.textContent=result;
   output.style.display='block';
