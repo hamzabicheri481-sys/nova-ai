@@ -1,5 +1,5 @@
 const ALLOWED_ORIGIN = "https://hamzabicheri481-sys.github.io";
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.8-flash";
 
 export default {
   async fetch(request, env) {
@@ -44,10 +44,10 @@ Be accurate, practical, clear and honest about uncertainty. Do not claim to have
 
 async function callGemini(apiKey, parts) {
   const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent?key=" + encodeURIComponent(apiKey),
+    "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent",
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ role: "user", parts }],
         generationConfig: { temperature: 0.3, maxOutputTokens: 1400 }
