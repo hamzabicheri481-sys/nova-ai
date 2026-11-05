@@ -19,7 +19,8 @@ export default {
     try {
       const body = await request.json();
       if (path === "/chat") return await chat(body, env, cors);
-      return json({ error: "Unknown endpoint. Use /chat." }, 404, cors);
+      if (path === "/analyze-image") return await analyzeImage(body, env, cors);
+      return json({ error: "Unknown endpoint." }, 404, cors);
     } catch (error) {
       return json({ error: "Could not process the request. Please try again." }, 400, cors);
     }
@@ -37,6 +38,26 @@ Be accurate, practical, clear and honest about uncertainty. Do not claim to have
   const result = await callGemini(env.GEMINI_API_KEY, [
     { text: system },
     { text: "User message:\n" + prompt }
+  ]);
+  if (!result.ok) return json({ error: result.error }, 502, cors);
+  return json({ answer: result.text }, 200, cors);
+}
+
+async function analyzeImage(body, env, cors) {
+  const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
+  const image = body?.image;
+  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+  if (!prompt) return json({ error: "Add chart context before analysis." }, 400, cors);
+  if (!image || !allowedTypes.includes(image.mimeType) || typeof image.data !== "string") {
+    return json({ error: "Upload a PNG, JPEG, or WEBP chart image." }, 400, cors);
+  }
+  if (image.data.length > 5600000 || !/^[A-Za-z0-9+/]+={0,2}$/.test(image.data)) {
+    return json({ error: "Image is too large or invalid. Maximum size is 4 MB." }, 413, cors);
+  }
+  const system = "You are NEXORA, an educational technical chart reader. Analyze only visible evidence. Never invent prices, candles, indicators, support/resistance, or live market data. If a level cannot be read precisely, say it is unclear. Present bullish and bearish scenarios, invalidation conditions, and risk notes. Entry, stop-loss and targets must be marked unavailable unless clearly inferable and justified from visible chart levels. Never promise profit or execute trades. Reply in Arabic.";
+  const result = await callGemini(env.GEMINI_API_KEY, [
+    { text: system + "\n" + prompt },
+    { inline_data: { mime_type: image.mimeType, data: image.data } }
   ]);
   if (!result.ok) return json({ error: result.error }, 502, cors);
   return json({ answer: result.text }, 200, cors);
