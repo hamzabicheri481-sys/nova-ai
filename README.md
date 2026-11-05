@@ -41,3 +41,32 @@ The browser sends requests only to the Worker. The Gemini key remains server-sid
 ## Security
 
 Never commit API keys, passwords, account credentials or private tokens. Keep provider secrets in Cloudflare Worker secrets.
+
+
+## Subscription system — planned, not active
+
+The current agreed commercial target is:
+- 30-day free trial
+- Then USD 20 per month
+
+**This is a product requirement only; it is not implemented or available for purchase.** There is currently no account system, verified trial clock, subscription database, checkout, payment provider integration, webhook handling, cancellation flow, or server-side entitlement enforcement.
+
+### Safe implementation sequence
+
+1. Decide what a visitor can access after the 30-day trial if they do not subscribe. This is still unresolved. Do not implement a paywall, ad-funded access, or post-trial access restriction until the product owner chooses the policy.
+2. Choose a payment provider that supports the business's country, currency, settlement and payout requirements; verify fees, recurring billing, refunds and chargebacks from official provider documentation.
+3. Implement user accounts and secure authentication before tying a trial or paid entitlement to an individual.
+4. Store trial start/end timestamps and subscription state server-side. Never trust a browser clock, local storage, or a client-supplied plan name to grant paid access.
+5. Create checkout sessions server-side; keep secret keys in Cloudflare Worker secrets only.
+6. Verify signed payment webhooks server-side and make webhook processing idempotent. Grant or revoke entitlements only from verified provider events.
+7. Add cancellation, failed-payment grace handling, refunds, customer support, privacy notice and terms before launch.
+8. Test trial expiry, successful payment, duplicate webhook, failed payment, cancellation, refund and unauthorized API access before enabling real payments.
+
+### Decisions still needed
+
+- Post-trial access for users who do not subscribe: **not decided**.
+- Payment provider and settlement method: **not selected or verified**.
+- Whether the USD 20 price includes applicable taxes/fees and how local-currency conversion is displayed: **not decided**.
+- Account registration and login method: **not implemented**.
+
+Until these decisions and implementation tests are complete, do not show an active checkout or claim that subscriptions are available.
