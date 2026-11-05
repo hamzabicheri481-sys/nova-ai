@@ -53,7 +53,7 @@ The current agreed commercial target is:
 
 ### Safe implementation sequence
 
-1. Decide what a visitor can access after the 30-day trial if they do not subscribe. This is still unresolved. Do not implement a paywall, ad-funded access, or post-trial access restriction until the product owner chooses the policy.
+1. Post-trial policy is now defined at product level: offer a free recommendation in exchange for a completed ad view; if the user declines the ad and has no paid subscription, block analysis access. Paid subscribers must see no ads. Do not treat an ad impression as verified completion until the chosen ad provider supports a trusted rewarded-ad completion signal.
 2. Choose a payment provider that supports the business's country, currency, settlement and payout requirements; verify fees, recurring billing, refunds and chargebacks from official provider documentation.
 3. Implement user accounts and secure authentication before tying a trial or paid entitlement to an individual.
 4. Store trial start/end timestamps and subscription state server-side. Never trust a browser clock, local storage, or a client-supplied plan name to grant paid access.
@@ -64,7 +64,7 @@ The current agreed commercial target is:
 
 ### Decisions still needed
 
-- Post-trial access for users who do not subscribe: **not decided**.
+- Post-trial access (confirmed product direction): a user who does not subscribe may receive a free recommendation after watching an ad; if they do not watch an ad, analysis access is blocked. A paying subscriber uses NEXORA without ads.
 - Payment provider and settlement method: **not selected or verified**.
 - Whether the USD 20 price includes applicable taxes/fees and how local-currency conversion is displayed: **not decided**.
 - Account registration and login method: **not implemented**.
