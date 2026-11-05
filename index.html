@@ -43,7 +43,7 @@
 <footer>© 2026 NOVA AI · Built step by step. <br>Contact and legal pages will be added before public launch.</footer>
 </div>
 <script>
-let mode='AI Assistant';const label=document.getElementById('modeLabel'),notice=document.getElementById('notice');const NOVA_API_BASE='';
+let mode='AI Assistant';const label=document.getElementById('modeLabel'),notice=document.getElementById('notice');const NOVA_API_BASE='https://nova-ai.hamzabicheri481.workers.dev';
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;label.textContent=mode+' · Describe what you need';}));
 document.getElementById('go').addEventListener('click',async()=>{
  const p=document.getElementById('prompt').value.trim();
