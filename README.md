@@ -46,32 +46,43 @@ Never commit API keys, passwords, account credentials or private tokens. Keep pr
 
 ## Subscription system — planned, not active
 
-The current agreed commercial target is:
-- 30-day free trial
-- Then USD 20 per month
+### Confirmed commercial direction
 
-**This is a product requirement only; it is not implemented or available for purchase.** There is currently no account system, verified trial clock, subscription database, checkout, payment provider integration, webhook handling, cancellation flow, or server-side entitlement enforcement.
+- Free trial target: **30 days**.
+- Paid plan target after the trial: **USD 20 per month**.
+- A paying subscriber is intended to use NEXORA without ads.
 
-### Safe implementation sequence
+These are product requirements only. They are **not implemented or available for purchase**. There is currently no account system, verified trial clock, subscription database, checkout, payment provider integration, webhook handling, cancellation flow, or server-side entitlement enforcement.
 
-1. Post-trial policy is now defined at product level: offer a free recommendation in exchange for a completed ad view; if the user declines the ad and has no paid subscription, block analysis access. Paid subscribers must see no ads. Do not treat an ad impression as verified completion until the chosen ad provider supports a trusted rewarded-ad completion signal.
-2. Choose a payment provider that supports the business's country, currency, settlement and payout requirements; verify fees, recurring billing, refunds and chargebacks from official provider documentation.
-3. Implement user accounts and secure authentication before tying a trial or paid entitlement to an individual.
-4. Store trial start/end timestamps and subscription state server-side. Never trust a browser clock, local storage, or a client-supplied plan name to grant paid access.
-5. Create checkout sessions server-side; keep secret keys in Cloudflare Worker secrets only.
-6. Verify signed payment webhooks server-side and make webhook processing idempotent. Grant or revoke entitlements only from verified provider events.
-7. Add cancellation, failed-payment grace handling, refunds, customer support, privacy notice and terms before launch.
-8. Test trial expiry, successful payment, duplicate webhook, failed payment, cancellation, refund and unauthorized API access before enabling real payments.
+### Post-trial access policy — decision required
 
-### Decisions still needed
+The access rule for a user whose 30-day trial ends without a paid subscription is **not yet confirmed**. Do not assume that this user should receive ad-supported access, be blocked automatically, or receive any particular number of free analyses.
 
-- Post-trial access (confirmed product direction): a user who does not subscribe may receive a free recommendation after watching an ad; if they do not watch an ad, analysis access is blocked. A paying subscriber uses NEXORA without ads.
+Until the user explicitly confirms this policy, do not implement or activate:
+- Payment or checkout.
+- Advertising or rewarded-ad flows.
+- Trial-expiry enforcement or changes to user permissions/access.
+- Any user-facing claim that the trial or paid subscription is active.
+
+### Other decisions still needed
+
+- When the 30-day trial starts and whether it can be used more than once: **not decided**.
 - Payment provider and settlement method: **not selected or verified**.
-- Whether the USD 20 price includes applicable taxes/fees and how local-currency conversion is displayed: **not decided**.
+- Whether USD 20 includes applicable taxes/fees and how local-currency conversion is displayed: **not decided**.
 - Account registration and login method: **not implemented**.
 
-Until these decisions and implementation tests are complete, do not show an active checkout or claim that subscriptions are available.
+### Safe implementation sequence after decisions
 
+1. Confirm the post-trial access rule and exact trial-start conditions.
+2. Choose a payment provider that supports the business's country, currency, settlement and payout requirements; verify recurring billing, fees, refunds and chargebacks from official provider documentation.
+3. Implement secure user accounts before tying a trial or paid entitlement to an individual.
+4. Store trial start/end timestamps and subscription state server-side. Never trust a browser clock, local storage, or a client-supplied plan name to grant access.
+5. Create checkout sessions server-side; keep secret keys in Cloudflare Worker secrets only.
+6. Verify signed payment webhooks server-side and make webhook processing idempotent. Grant or revoke entitlements only from verified provider events.
+7. Add cancellation, failed-payment handling, refunds, customer support, privacy notice and terms before launch.
+8. Test trial expiry, successful payment, duplicate webhook, failed payment, cancellation, refund and unauthorized API access before enabling real payments.
+
+Until the required decisions and implementation tests are complete, do not show an active checkout or claim that subscriptions are available.
 
 ### Optional automated Worker deployment
 
