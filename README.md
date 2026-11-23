@@ -84,12 +84,10 @@ Until the user explicitly confirms this policy, do not implement or activate:
 
 Until the required decisions and implementation tests are complete, do not show an active checkout or claim that subscriptions are available.
 
-### Optional automated Worker deployment
+### Worker deployment policy
 
-The repository includes `.github/workflows/deploy-worker.yml` and `wrangler.toml`. To enable manual deployment from GitHub Actions, add these two repository Actions secrets (never commit them):
-- `CLOUDFLARE_API_TOKEN`: a Cloudflare API token with permission to edit/deploy Workers for this account.
-- `CLOUDFLARE_ACCOUNT_ID`: the Cloudflare account ID.
+Worker deployment is intentionally manual through the Cloudflare dashboard. Do not store Cloudflare API tokens, account credentials, or other deployment secrets in this GitHub repository or GitHub Actions secrets.
 
-Then open **GitHub → Actions → Deploy Cloudflare Worker → Run workflow**. The workflow is manual-only so it will not fail before the secrets are configured. The Gemini key remains a separate Cloudflare Worker secret named `GEMINI_API_KEY`.
+To deploy, review `worker.js` and upload/deploy it from the Cloudflare dashboard for the Worker named `nova-ai`. Keep the Gemini runtime key as a Cloudflare Worker secret named `GEMINI_API_KEY`; never put it in the website, source files, or GitHub.
 
-The GitHub Pages workflow deploys the website only; it does not deploy the Worker. A successful Pages deployment does not prove the AI backend is deployed.
+The GitHub Pages workflow deploys the static website only. A successful Pages deployment does not deploy or verify the Cloudflare Worker.
